@@ -1,0 +1,15 @@
+.card:hover {
+  border-color: black;
+}
+
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: rgb(0, 0, 0);
+  color: white;
+  display: grid;
+  place-items: center; /* centers both vertically and horizontally */
+  height: 80px;
+}

@@ -1,0 +1,14 @@
+<!--Maybe Make Into Standalone Route instead of child of login?-->
+
+<div class="container w-50 text-center">
+  <h2>Welcome</h2>
+  <div class="card">
+    <div class="card-header">
+      <h4>Account Details</h4>
+    </div>
+    <div class="card-body text-start">
+      <p>Username: {{ user()?.name }}</p>
+      <p>Email: {{ user()?.email }}</p>
+    </div>
+  </div>
+</div>
