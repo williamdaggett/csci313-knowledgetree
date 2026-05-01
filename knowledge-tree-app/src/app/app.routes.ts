@@ -7,6 +7,7 @@ import { BrowseTrees } from './Components/browse-trees/browse-trees';
 import { TreeDisplay } from './Components/tree-display/tree-display';
 import { TreeCreator } from './Components/tree-creator/tree-creator';
 import { authGuard } from './guards/auth-guard';
+import { TreeEditor } from './Components/tree-editor/tree-editor';
 
 export const routes: Routes = [
   { path: '', component: Home, title: 'Home' },
@@ -21,4 +22,10 @@ export const routes: Routes = [
   { path: 'browse-trees', component: BrowseTrees, title: 'Browse Trees', canActivate: [authGuard] },
   { path: 'tree/:id', component: TreeDisplay, title: 'Tree Display', canActivate: [authGuard] },
   { path: 'create-tree', component: TreeCreator, title: 'Create Tree', canActivate: [authGuard] },
+  {
+    path: 'edit-tree/:id',
+    component: TreeEditor,
+    title: 'Edit Tree',
+    canActivate: [authGuard],
+  },
 ];

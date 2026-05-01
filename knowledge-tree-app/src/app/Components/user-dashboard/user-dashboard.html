@@ -1,1 +1,21 @@
-<p>user-dashboard works!</p>
+<div class="container text-center">
+  <h1 class="mb-5">My Trees</h1>
+  <div class="row">
+    <div class="col-md-6">
+      <h2>Trees you created</h2>
+      <ul class="list-group">
+        @for (t of createdTrees(); track $index) {
+          <li class="list-group-item">
+            {{ t.name }} - {{ t.description }} <a [routerLink]="['/edit-tree', t.id]">edit</a>
+          </li>
+        }
+      </ul>
+    </div>
+    <div class="col-md-6">
+      <h2>Trees you are learning from</h2>
+      @for (t of []; track $index) {
+        <!--Display tree info-->
+      }
+    </div>
+  </div>
+</div>
