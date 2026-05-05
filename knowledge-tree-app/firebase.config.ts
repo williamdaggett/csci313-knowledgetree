@@ -11,7 +11,13 @@ import { getAuth } from 'firebase/auth';
 
 //add your fir
 const firebaseConfig = {
-  //Add your firbase config here
+  apiKey: 'AIzaSyDvlRsFFUi60ScqOuG5NQRhiLZMjm0CVRE',
+  authDomain: 'crud-demo-a7e2c.firebaseapp.com',
+  projectId: 'crud-demo-a7e2c',
+  storageBucket: 'crud-demo-a7e2c.firebasestorage.app',
+  messagingSenderId: '827258894762',
+  appId: '1:827258894762:web:481400d2fbbfcfe15b93d3',
+  measurementId: 'G-T2N0PX8LBP',
 };
 
 // Initialize Firebase

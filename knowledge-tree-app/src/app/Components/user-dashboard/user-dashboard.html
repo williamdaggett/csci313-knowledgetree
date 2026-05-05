@@ -6,7 +6,9 @@
       <ul class="list-group">
         @for (t of createdTrees(); track $index) {
           <li class="list-group-item">
-            {{ t.name }} - {{ t.description }} <a [routerLink]="['/edit-tree', t.id]">edit</a>
+            {{ t.name }} - {{ t.description }}
+            <button class="btn btn-primary" [routerLink]="['/edit-tree', t.id]">edit</button>
+            <button class="btn btn-danger" (click)="treeAPI.delete(t.id)">Delete</button>
           </li>
         }
       </ul>

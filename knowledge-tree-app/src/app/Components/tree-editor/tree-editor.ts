@@ -14,23 +14,17 @@ import { TreeAPI } from '../../Services/tree-api';
 import { Timestamp } from 'firebase/firestore';
 import { AuthService } from '../../Services/authentication';
 import { REQUIRED } from '@angular/forms/signals';
+import { DiagramEdit } from '../diagram-edit/diagram-edit';
+import { TreeDiagram } from '../../models/tree-diagram';
 
 @Component({
   selector: 'app-tree-creator',
-  imports: [FormsModule],
+  imports: [FormsModule, DiagramEdit],
   templateUrl: './tree-editor.html',
   styleUrl: './tree-editor.css',
 })
 export class TreeEditor {
   id = input.required<string>(); //might need new edit component tbh it would probably be easier
-
-  ttest = computed<string>(() => {
-    if (this.id()) {
-      return this.id()!;
-    } else {
-      return '';
-    }
-  });
 
   treeAPI = inject(TreeAPI);
   authService = inject(AuthService);
@@ -39,6 +33,8 @@ export class TreeEditor {
   TreeName = signal<string>('');
   TreeOriginalDescription = signal<string | null>(null);
   TreeDescription = signal<string>('');
+
+  TreeDiagramId = signal<string>('');
 
   loading = signal<boolean>(false);
 
@@ -53,7 +49,7 @@ export class TreeEditor {
     );
   });
 
-  ngOnChanges(changes: SimpleChanges) {
+  /*ngOnChanges(changes: SimpleChanges) {
     if (changes['treeInput'] && this.id())
       this.treeAPI
         .getById(this.id()!)
@@ -62,13 +58,14 @@ export class TreeEditor {
           console.log(this.id());
           if (t) {
             console.log(t.name);
+            this.TreeDiagramId.set(t.tree_id);
             this.TreeOriginalName.set(t.name);
             this.TreeOriginalDescription.set(t.description);
             this.TreeName.set(t.name);
             this.TreeDescription.set(t.description);
           }
         });
-  }
+  }*/
 
   constructor() {
     this.authService.user$.pipe().subscribe((u) => this.userId.set(u?.uid!));
@@ -84,9 +81,30 @@ export class TreeEditor {
             this.TreeOriginalName.set(t.name);
             this.TreeDescription.set(t.description);
             this.TreeName.set(t.name);
+            this.TreeDiagramId.set(t.tree_id);
           });
       }
     });
+    effect(() => {
+      const value = this.TreeDiagramId();
+      if (value) {
+        this.treeAPI
+          .getDiagram(value)!
+          .pipe()
+          .subscribe((t) => {
+            if (t) {
+              this.treeAPI.nodeList.set(t.nodeList);
+            }
+          });
+      }
+    });
+  }
+
+  saveDiagram() {
+    const treeDiagram = {
+      nodeList: this.treeAPI.nodeList(),
+    } as Partial<TreeDiagram>;
+    this.treeAPI.saveDiagram(this.TreeDiagramId(), treeDiagram);
   }
 
   async SaveTree() {
