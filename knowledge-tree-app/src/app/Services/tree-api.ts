@@ -3,15 +3,14 @@ import {
   collection,
   query,
   where,
-  collectionData,
   getDoc,
   getDocs,
   doc,
-  docData,
   addDoc,
   updateDoc,
   deleteDoc,
-} from '@angular/fire/firestore';
+  onSnapshot,
+} from 'firebase/firestore';
 import { Observable } from 'rxjs';
 import { TreeDescription } from '../models/tree-description';
 import { TreeDiagram, TreeNode } from '../models/tree-diagram';
@@ -80,12 +79,23 @@ export class TreeAPI {
   }
 
   //READ diagram
-  getDiagram(id: string) {
-    if (!id) {
-      return;
-    }
-    const ref = doc(db, `${this.diagramCollection}/${id}`);
-    return docData(ref, { idField: 'id' }) as Observable<TreeDiagram>;
+  getDiagram(id: string): Observable<TreeDiagram> {
+    return new Observable((observer) => {
+      if (!id) return;
+
+      const ref = doc(db, `${this.diagramCollection}/${id}`);
+
+      const unsub = onSnapshot(ref, (snap) => {
+        if (snap.exists()) {
+          observer.next({
+            id: snap.id,
+            ...snap.data(),
+          } as TreeDiagram);
+        }
+      });
+
+      return () => unsub();
+    });
   }
 
   //UPDATE diagram
@@ -121,22 +131,57 @@ export class TreeAPI {
 
   // READ (all)
   getAll(): Observable<TreeDescription[]> {
-    const ref = collection(db, this.collectionName);
-    return collectionData(ref, { idField: 'id' }) as Observable<TreeDescription[]>;
+    return new Observable((observer) => {
+      const ref = collection(db, this.collectionName);
+
+      const unsubscribe = onSnapshot(ref, (snapshot) => {
+        const data = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as TreeDescription[];
+
+        observer.next(data);
+      });
+
+      return () => unsubscribe();
+    });
   }
 
   getByAuther(userId: string): Observable<TreeDescription[]> {
-    const ref = collection(db, this.collectionName);
-    const q = query(ref, where('authorId', '==', userId));
-    return collectionData(q, { idField: 'id' }) as Observable<TreeDescription[]>;
+    return new Observable((observer) => {
+      const ref = collection(db, this.collectionName);
+      const q = query(ref, where('authorId', '==', userId));
+
+      const unsub = onSnapshot(q, (snapshot) => {
+        const data = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as TreeDescription[];
+
+        observer.next(data);
+      });
+
+      return () => unsub();
+    });
   }
 
   // READ (single)
   getById(id: string): Observable<TreeDescription> {
-    const ref = doc(db, `${this.collectionName}/${id}`);
-    return docData(ref, { idField: 'id' }) as Observable<TreeDescription>;
-  }
+    return new Observable((observer) => {
+      const ref = doc(db, `${this.collectionName}/${id}`);
 
+      const unsubscribe = onSnapshot(ref, (docSnap) => {
+        if (docSnap.exists()) {
+          observer.next({
+            id: docSnap.id,
+            ...docSnap.data(),
+          } as TreeDescription);
+        }
+      });
+
+      return () => unsubscribe();
+    });
+  }
   // UPDATE
   update(id: string, tree: Partial<TreeDescription>) {
     const ref = doc(db, `${this.collectionName}/${id}`);
