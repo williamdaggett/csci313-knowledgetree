@@ -119,7 +119,7 @@ export class TreeAPI {
 
       const ref = doc(db, `${this.diagramCollection}/${id}`);
 
-      const unsub = onSnapshot(ref, (snap) => {
+      const unsub = onSnapshot(ref, (snap: any) => {
         if (snap.exists()) {
           observer.next({
             id: snap.id,
@@ -168,8 +168,8 @@ export class TreeAPI {
     return new Observable((observer) => {
       const ref = collection(db, this.collectionName);
 
-      const unsubscribe = onSnapshot(ref, (snapshot) => {
-        const data = snapshot.docs.map((doc) => ({
+      const unsubscribe = onSnapshot(ref, (snapshot: any) => {
+        const data = snapshot.docs.map((doc: any) => ({
           id: doc.id,
           ...doc.data(),
         })) as TreeDescription[];
@@ -186,8 +186,8 @@ export class TreeAPI {
       const ref = collection(db, this.collectionName);
       const q = query(ref, where('authorId', '==', userId));
 
-      const unsub = onSnapshot(q, (snapshot) => {
-        const data = snapshot.docs.map((doc) => ({
+      const unsub = onSnapshot(q, (snapshot: any) => {
+        const data = snapshot.docs.map((doc: any) => ({
           id: doc.id,
           ...doc.data(),
         })) as TreeDescription[];
@@ -204,7 +204,7 @@ export class TreeAPI {
     return new Observable((observer) => {
       const ref = doc(db, `${this.collectionName}/${id}`);
 
-      const unsubscribe = onSnapshot(ref, (docSnap) => {
+      const unsubscribe = onSnapshot(ref, (docSnap: any) => {
         if (docSnap.exists()) {
           observer.next({
             id: docSnap.id,

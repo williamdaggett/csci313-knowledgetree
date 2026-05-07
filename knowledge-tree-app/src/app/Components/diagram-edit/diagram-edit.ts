@@ -72,7 +72,7 @@ export class DiagramEdit {
           contentId: node.contentId,
         }));
 
-        this.items = new DataManager(syncfusionNodes as JSON[], new Query().take(500));
+        this.items = new DataManager(syncfusionNodes as any[], new Query().take(500));
         
         // Refresh diagram data
         this.diagram.dataSourceSettings = {
@@ -98,11 +98,11 @@ export class DiagramEdit {
     if (node.data && (node.data as any).shape) {
       const shape = (node.data as any).shape.toLowerCase();
       if (shape === 'circle' || shape === 'ellipse') {
-        node.shape = { type: 'Circle' };
+        (node as any).shape = 'Circle';
       } else if (shape === 'rectangle') {
-        node.shape = { type: 'Rectangle' };
+        (node as any).shape = 'Rectangle';
       } else if (shape === 'diamond') {
-        node.shape = { type: 'Diamond' };
+        (node as any).shape = 'Diamond';
       }
     }
 
@@ -140,7 +140,7 @@ export class DiagramEdit {
       },
     ];
     
-    this.items = new DataManager(initialData as JSON[], new Query().take(500));
+    this.items = new DataManager(initialData as any[], new Query().take(500));
 
     //Uses layout to auto-arrange nodes on the Diagram page
     this.layout = {
