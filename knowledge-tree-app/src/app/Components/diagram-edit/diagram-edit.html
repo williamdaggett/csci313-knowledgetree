@@ -1,12 +1,74 @@
-<ejs-diagram
-  #diagram
-  id="diagram"
-  [width]="'100%'"
-  [height]="'600px'"
-  [layout]="layout"
-  [getNodeDefaults]="getNodeDefaults"
-  [getConnectorDefaults]="getConnectorDefaults"
-  [dataSourceSettings]="dataSourceSettings"
-  (click)="onClick($event)"
->
-</ejs-diagram>
+<div class="diagram-editor-container">
+  <div class="node-creation-panel">
+    <h4>Create New Node</h4>
+    <form (ngSubmit)="createNode()">
+      <div class="form-group">
+        <label for="nodeName">Node Name:</label>
+        <input 
+          type="text" 
+          id="nodeName"
+          [(ngModel)]="nodeName"
+          name="nodeName"
+          class="form-control"
+          placeholder="Enter node name"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="parentId">Parent Node:</label>
+        <select 
+          id="parentId"
+          [(ngModel)]="selectedParentId"
+          name="parentId"
+          class="form-control"
+        >
+          @for (nodeId of getNodeIds(); track nodeId) {
+            <option [value]="nodeId">{{ nodeId }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="nodeColor">Color:</label>
+        <input 
+          type="color" 
+          id="nodeColor"
+          [(ngModel)]="nodeColor"
+          name="nodeColor"
+          class="form-control"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="nodeShape">Shape:</label>
+        <select 
+          id="nodeShape"
+          [(ngModel)]="nodeShape"
+          name="nodeShape"
+          class="form-control"
+        >
+          <option value="Circle">Circle</option>
+          <option value="Ellipse">Ellipse</option>
+          <option value="Rectangle">Rectangle</option>
+          <option value="Diamond">Diamond</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Create Node</button>
+    </form>
+  </div>
+
+  <ejs-diagram
+    #diagram
+    id="diagram"
+    [width]="'100%'"
+    [height]="'600px'"
+    [layout]="layout"
+    [getNodeDefaults]="getNodeDefaults"
+    [getConnectorDefaults]="getConnectorDefaults"
+    [dataSourceSettings]="dataSourceSettings"
+    (click)="onClick($event)"
+  >
+  </ejs-diagram>
+</div>
