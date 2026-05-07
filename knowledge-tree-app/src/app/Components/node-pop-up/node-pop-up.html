@@ -1,16 +1,236 @@
-<div class="card">
-  <div class="card-header"><h4>{{ data.name }}</h4></div>
-  <div class="card-body">
-    <!-- Node Actions -->
-    <div class="section">
-      <h5>Node Actions:</h5>
-      <div><button class="btn btn-primary" (click)="addChild()">Add Child</button></div>
-      @if (data.id != '1') {
-        <div><button class="btn btn-danger" (click)="deleteNode()">Delete Node</button></div>
+<div class="node-popup-container">
+  <!-- Node Actions -->
+  <div class="card mb-3">
+    <div class="card-header"><h5>Node: {{ data.name }}</h5></div>
+    <div class="card-body">
+      <div class="btn-group mb-2" role="group">
+        <button class="btn btn-primary btn-sm" (click)="addChild()">Add Child</button>
+        @if (data.id != '1') {
+          <button class="btn btn-danger btn-sm" (click)="deleteNode()">Delete Node</button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Display -->
+  <div class="card mb-3">
+    <div class="card-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Node Content</h5>
+        <button 
+          class="btn btn-sm btn-outline-primary" 
+          (click)="showAddForm.set(!showAddForm())"
+          [disabled]="loading()"
+        >
+          {{ showAddForm() ? 'Cancel' : '+ Add Content' }}
+        </button>
+      </div>
+    </div>
+    <div class="card-body">
+      @if (loading()) {
+        <div class="text-center text-muted">
+          <span>Loading...</span>
+        </div>
+      } @else if (!nodeContent()) {
+        <p class="text-muted text-center">No content yet</p>
+      } @else if (nodeContent()!.items.length === 0) {
+        <p class="text-muted text-center">No content items. Click "Add Content" to get started.</p>
+      } @else {
+        <div class="content-list">
+          @for (item of nodeContent()!.items; track $index) {
+            <div class="content-item mb-3 p-3 border rounded">
+              @switch (item.type) {
+                @case ('video') {
+                  <div class="video-content">
+                    <h6>📹 {{ item.title }}</h6>
+                    @if (item.description) {
+                      <p class="text-muted small">{{ item.description }}</p>
+                    }
+                    @if (item.thumbnail) {
+                      <img [src]="item.thumbnail" class="img-fluid mb-2" style="max-height: 150px;">
+                    }
+                    <p class="text-break"><small>{{ item.url }}</small></p>
+                  </div>
+                }
+                @case ('image') {
+                  <div class="image-content">
+                    <h6>🖼️ {{ item.title }}</h6>
+                    @if (item.description) {
+                      <p class="text-muted small">{{ item.description }}</p>
+                    }
+                    <img [src]="item.url" class="img-fluid mb-2" style="max-height: 200px;">
+                  </div>
+                }
+                @case ('text') {
+                  <div class="text-content">
+                    <h6>📝 {{ item.title || 'Text Content' }}</h6>
+                    <p style="white-space: pre-wrap;">{{ item.content }}</p>
+                  </div>
+                }
+              }
+              <div class="btn-group btn-group-sm" role="group">
+                <button 
+                  class="btn btn-outline-secondary" 
+                  (click)="editContent($index)"
+                  [disabled]="loading()"
+                >
+                  Edit
+                </button>
+                <button 
+                  class="btn btn-outline-danger" 
+                  (click)="deleteContent($index)"
+                  [disabled]="loading()"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          }
+        </div>
       }
     </div>
-
-    <!-- Content Manager -->
-    <app-node-content-manager [nodeId]="data.id"></app-node-content-manager>
   </div>
+
+  <!-- Add/Edit Content Form -->
+  @if (showAddForm()) {
+    <div class="card">
+      <div class="card-header">
+        <h5>{{ editingIndex() !== null ? 'Edit Content' : 'Add Content' }}</h5>
+      </div>
+      <div class="card-body">
+        <form (ngSubmit)="addContent()">
+          <!-- Content Type Selection -->
+          <div class="mb-3">
+            <label class="form-label">Content Type</label>
+            <select 
+              [(ngModel)]="contentType" 
+              name="contentType"
+              class="form-select"
+              [disabled]="editingIndex() !== null"
+            >
+              <option value="text">📝 Text</option>
+              <option value="image">🖼️ Image</option>
+              <option value="video">📹 Video (YouTube/Vimeo)</option>
+            </select>
+          </div>
+
+          <!-- Text Content Form -->
+          @if (contentType() === 'text') {
+            <div class="mb-3">
+              <label class="form-label">Title (Optional)</label>
+              <input 
+                type="text" 
+                [(ngModel)]="textTitle"
+                name="textTitle"
+                class="form-control"
+                placeholder="Enter title"
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Content</label>
+              <textarea 
+                [(ngModel)]="textContent"
+                name="textContent"
+                class="form-control"
+                rows="5"
+                placeholder="Enter your text content"
+                required
+              ></textarea>
+            </div>
+          }
+
+          <!-- Image Content Form -->
+          @if (contentType() === 'image') {
+            <div class="mb-3">
+              <label class="form-label">Image URL</label>
+              <input 
+                type="url" 
+                [(ngModel)]="imageUrl"
+                name="imageUrl"
+                class="form-control"
+                placeholder="https://example.com/image.jpg"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Title</label>
+              <input 
+                type="text" 
+                [(ngModel)]="imageTitle"
+                name="imageTitle"
+                class="form-control"
+                placeholder="Enter image title"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Description (Optional)</label>
+              <textarea 
+                [(ngModel)]="imageDescription"
+                name="imageDescription"
+                class="form-control"
+                rows="2"
+                placeholder="Enter description"
+              ></textarea>
+            </div>
+          }
+
+          <!-- Video Content Form -->
+          @if (contentType() === 'video') {
+            <div class="mb-3">
+              <label class="form-label">Video URL (YouTube/Vimeo)</label>
+              <input 
+                type="url" 
+                [(ngModel)]="videoUrl"
+                name="videoUrl"
+                class="form-control"
+                placeholder="https://www.youtube.com/watch?v=..."
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Title</label>
+              <input 
+                type="text" 
+                [(ngModel)]="videoTitle"
+                name="videoTitle"
+                class="form-control"
+                placeholder="Enter video title"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Description (Optional)</label>
+              <textarea 
+                [(ngModel)]="videoDescription"
+                name="videoDescription"
+                class="form-control"
+                rows="2"
+                placeholder="Enter video description"
+              ></textarea>
+            </div>
+          }
+
+          <!-- Form Actions -->
+          <div class="btn-group" role="group">
+            <button 
+              type="submit" 
+              class="btn btn-primary"
+              [disabled]="loading()"
+            >
+              {{ loading() ? 'Saving...' : (editingIndex() !== null ? 'Update' : 'Add') }}
+            </button>
+            <button 
+              type="button" 
+              class="btn btn-secondary"
+              (click)="resetForm()"
+              [disabled]="loading()"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
 </div>
