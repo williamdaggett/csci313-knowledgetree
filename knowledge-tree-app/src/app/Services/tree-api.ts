@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import {
   collection,
   query,
@@ -10,11 +10,12 @@ import {
   updateDoc,
   deleteDoc,
   onSnapshot,
-} from 'firebase/firestore';
+} from '../../../firebase.config';
 import { Observable } from 'rxjs';
 import { TreeDescription } from '../models/tree-description';
 import { TreeDiagram, TreeNode } from '../models/tree-diagram';
 import { db } from '../../../firebase.config';
+import { ContentService } from './content';
 
 @Injectable({
   providedIn: 'root',
@@ -22,6 +23,7 @@ import { db } from '../../../firebase.config';
 export class TreeAPI {
   private collectionName = 'treeDescriptions';
   private diagramCollection = 'treeDiagrams';
+  private contentService = inject(ContentService);
 
   nodeList = signal<TreeNode[]>([]);
 
@@ -39,15 +41,32 @@ export class TreeAPI {
   }*/
 
   createNode(name: string, parent: string, shape: string, color: string) {
-    const node = {
-      id: Date.now().toString(),
-      name: name,
-      parent: parent,
-      shape: shape,
-      color: color,
-      contentId: null,
-    } as TreeNode;
-    this.nodeList.update((t) => [...t, node]);
+    const nodeId = Date.now().toString();
+    
+    // Create content for this node
+    this.contentService.createContent(nodeId).then((contentId) => {
+      const node = {
+        id: nodeId,
+        name: name,
+        parent: parent,
+        shape: shape,
+        color: color,
+        contentId: contentId,
+      } as TreeNode;
+      this.nodeList.update((t) => [...t, node]);
+    }).catch((error) => {
+      console.error('Error creating node content:', error);
+      // Still add node even if content creation fails
+      const node = {
+        id: nodeId,
+        name: name,
+        parent: parent,
+        shape: shape,
+        color: color,
+        contentId: null,
+      } as TreeNode;
+      this.nodeList.update((t) => [...t, node]);
+    });
   }
 
   editNode(node: TreeNode) {
@@ -66,16 +85,31 @@ export class TreeAPI {
       return t.filter((n) => {
         if (n.parent && n.parent in idList) {
           idList.push(n.id);
-          n.contentId; //TODO remove the content from this id
+          // Delete associated content
+          if (n.contentId) {
+            this.contentService.deleteNodeContent(n.id).catch((error) => {
+              console.error('Error deleting content for node:', n.id, error);
+            });
+          }
           return false;
         }
         if (n.id === id) {
-          n.contentId; //TODO remove the content from this id
+          // Delete associated content
+          if (n.contentId) {
+            this.contentService.deleteNodeContent(n.id).catch((error) => {
+              console.error('Error deleting content for node:', n.id, error);
+            });
+          }
           return false;
         }
         return true;
       });
     });
+  }
+
+  // Get content for a specific node
+  getNodeContent(nodeId: string) {
+    return this.contentService.getNodeContent(nodeId);
   }
 
   //READ diagram

@@ -1,0 +1,78 @@
+.node-popup-container {
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.content-item {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  transition: all 0.2s ease;
+}
+
+.content-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.video-content,
+.image-content,
+.text-content {
+  margin-bottom: 10px;
+}
+
+.video-content h6,
+.image-content h6,
+.text-content h6 {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.video-content img,
+.image-content img {
+  border-radius: 4px;
+  display: block;
+}
+
+.text-content p {
+  margin: 0;
+  line-height: 1.6;
+  color: #555;
+  font-size: 14px;
+}
+
+.content-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.btn-group-sm .btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.85rem;
+}
+
+.form-label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.justify-content-between {
+  justify-content: space-between;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.mb-0 {
+  margin-bottom: 0;
+}
+
+.text-break {
+  word-break: break-word;
+}
