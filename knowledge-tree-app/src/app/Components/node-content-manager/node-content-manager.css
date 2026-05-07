@@ -1,0 +1,162 @@
+.node-content-manager {
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 15px;
+  margin-top: 15px;
+  background-color: #f8f9fa;
+}
+
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.content-header h5 {
+  margin: 0;
+  color: #333;
+}
+
+.content-form {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #495057;
+  font-size: 14px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.content-list {
+  margin-top: 15px;
+}
+
+.content-item {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.content-header-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+
+.content-header-item h6 {
+  margin: 0;
+  flex: 1;
+  color: #333;
+  font-size: 15px;
+}
+
+.content-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  text-transform: uppercase;
+}
+
+.badge-text {
+  background-color: #007bff;
+}
+
+.badge-image {
+  background-color: #28a745;
+}
+
+.badge-video {
+  background-color: #dc3545;
+}
+
+.content-description {
+  color: #6c757d;
+  font-size: 13px;
+  margin: 8px 0;
+  font-style: italic;
+}
+
+.content-preview {
+  margin-top: 10px;
+  border-radius: 4px;
+}
+
+.text-content {
+  background-color: #f8f9fa;
+  padding: 10px;
+  border-radius: 4px;
+  max-height: 150px;
+  overflow-y: auto;
+  color: #333;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.image-content {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+}
+
+.video-content {
+  width: 100%;
+  height: 200px;
+  border: none;
+}
+
+.text-muted {
+  color: #6c757d;
+  font-size: 13px;
+  text-align: center;
+  padding: 20px 0;
+  margin: 0;
+}
+
+.btn {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.w-100 {
+  width: 100%;
+}

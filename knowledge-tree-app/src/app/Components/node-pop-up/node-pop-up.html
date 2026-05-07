@@ -1,9 +1,16 @@
 <div class="card">
-  <div class="card-header"><h4>Node Actions:</h4></div>
+  <div class="card-header"><h4>{{ data.name }}</h4></div>
   <div class="card-body">
-    <div><button class="btn btn-primary" (click)="addChild()">Add Child</button></div>
-    @if (data.id != '1') {
-      <div><button class="btn btn-danger" (click)="deleteNode()">Delete Node</button></div>
-    }
+    <!-- Node Actions -->
+    <div class="section">
+      <h5>Node Actions:</h5>
+      <div><button class="btn btn-primary" (click)="addChild()">Add Child</button></div>
+      @if (data.id != '1') {
+        <div><button class="btn btn-danger" (click)="deleteNode()">Delete Node</button></div>
+      }
+    </div>
+
+    <!-- Content Manager -->
+    <app-node-content-manager [nodeId]="data.id"></app-node-content-manager>
   </div>
 </div>

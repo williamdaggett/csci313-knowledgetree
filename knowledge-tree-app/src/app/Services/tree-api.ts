@@ -14,6 +14,7 @@ import {
 import { Observable } from 'rxjs';
 import { TreeDescription } from '../models/tree-description';
 import { TreeDiagram, TreeNode } from '../models/tree-diagram';
+import { NodeContent } from '../models/node-content';
 import { db } from '../../../firebase.config';
 
 @Injectable({
@@ -212,5 +213,94 @@ export class TreeAPI {
     }
 
     await deleteDoc(ref);
+  }
+
+  // ====== CONTENT MANAGEMENT ======
+  private contentCollection = 'nodeContent';
+
+  // Extract YouTube ID from various YouTube URL formats
+  private extractYoutubeId(url: string): string | null {
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/,
+      /youtube\.com\/embed\/([^&\n?#]+)/,
+    ];
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+    return null;
+  }
+
+  // ADD content to node
+  async addContentToNode(nodeId: string, content: Omit<NodeContent, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
+    const ref = collection(db, this.contentCollection);
+    
+    // Extract YouTube ID if it's a video
+    let youtubeId: string | null = null;
+    if (content.type === 'video' && content.url) {
+      youtubeId = this.extractYoutubeId(content.url);
+    }
+
+    const newContent = {
+      ...content,
+      youtubeId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    const docRef = await addDoc(ref, newContent);
+    return docRef.id;
+  }
+
+  // GET all content for a node
+  async getNodeContent(nodeId: string): Promise<NodeContent[]> {
+    const ref = collection(db, this.contentCollection);
+    const q = query(ref, where('nodeId', '==', nodeId));
+    const snapshot = await getDocs(q);
+    
+    return snapshot.docs.map((doc: any) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+  }
+
+  // UPDATE content
+  async updateContent(contentId: string, updates: Partial<NodeContent>): Promise<void> {
+    const ref = doc(db, `${this.contentCollection}/${contentId}`);
+    
+    // Update YouTube ID if URL changed
+    if (updates.url && updates.type === 'video') {
+      updates.youtubeId = this.extractYoutubeId(updates.url) || undefined;
+    }
+    
+    updates.updatedAt = new Date();
+    
+    await updateDoc(ref, updates);
+  }
+
+  // DELETE content
+  async deleteContent(contentId: string): Promise<void> {
+    const ref = doc(db, `${this.contentCollection}/${contentId}`);
+    await deleteDoc(ref);
+  }
+
+  // Watch content for a node in real-time
+  watchNodeContent(nodeId: string): Observable<NodeContent[]> {
+    return new Observable((observer) => {
+      const ref = collection(db, this.contentCollection);
+      const q = query(ref, where('nodeId', '==', nodeId));
+
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const content = snapshot.docs.map((doc: any) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        observer.next(content);
+      });
+
+      return () => unsubscribe();
+    });
   }
 }
