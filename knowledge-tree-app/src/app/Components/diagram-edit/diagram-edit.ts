@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation, ViewChild, inject, effect } from '@angular/core';
+import { Component, ViewEncapsulation, ViewChild, inject, effect, signal } from '@angular/core';
 import {
   DiagramComponent,
   Diagram,
@@ -21,11 +21,12 @@ import { TreeAPI } from '../../Services/tree-api';
 import { TreeNode } from '../../models/tree-diagram';
 import { MatDialog } from '@angular/material/dialog';
 import { NodePopUp } from '../node-pop-up/node-pop-up';
+import { FormsModule } from '@angular/forms';
 
 Diagram.Inject(DataBinding, RadialTree);
 
 @Component({
-  imports: [DiagramModule],
+  imports: [DiagramModule, FormsModule],
 
   providers: [RadialTreeService, DataBindingService],
   standalone: true,
@@ -44,6 +45,12 @@ export class DiagramEdit {
   treeAPI = inject(TreeAPI);
   dialog = inject(MatDialog);
 
+  // Form signals for creating nodes
+  nodeName = signal<string>('');
+  selectedParentId = signal<string>('1');
+  nodeColor = signal<string>('#0d6efd'); // Bootstrap primary blue
+  nodeShape = signal<string>('Circle');
+
   //Initializes data source
   public data: object[] = [
     {
@@ -54,47 +61,62 @@ export class DiagramEdit {
 
   constructor() {
     effect(() => {
-      const nodes = this.treeAPI.nodeList() as object[];
-      if (nodes && nodes.length > 0) {
-        if (this.diagram) {
-          this.items = new DataManager(nodes as JSON[], new Query().take(7));
-          //Uses layout to auto-arrange nodes on the Diagram page
-          this.layout = {
-            //set layout type
-            type: 'RadialTree',
-            root: '1',
-          };
-          this.diagram.dataSourceSettings = {
-            id: 'id',
-            parentId: 'parent',
-            dataSource: this.items,
-          };
-        }
+      const nodes = this.treeAPI.nodeList() as any[];
+      if (nodes && nodes.length > 0 && this.diagram) {
+        // Convert TreeNode format to Syncfusion format
+        const syncfusionNodes = nodes.map((node) => ({
+          id: node.id,
+          name: node.name,
+          parentId: node.parent, // Map 'parent' to 'parentId' for Syncfusion
+          color: node.color,
+          shape: node.shape,
+          contentId: node.contentId,
+        }));
+
+        this.items = new DataManager(syncfusionNodes as JSON[], new Query().take(500));
+        
+        // Refresh diagram data
+        this.diagram.dataSourceSettings = {
+          id: 'id',
+          parentId: 'parentId',
+          dataSource: this.items,
+        };
       }
     });
   }
 
   //Sets the default properties for nodes
-  public getNodeDefaults(node: NodeModel){
+  public getNodeDefaults(node: NodeModel): NodeModel {
     node.height = 50;
     node.width = 50;
-    node.style = {
-      fill: 'LightGreen',
-      strokeColor: 'black',
-      strokeWidth: 3,
-      gradient: {
-        type: 'Linear',
-        x1: 0,
-        y1: 0,
-        x2: 50,
-        y2: 50,
-        stops: [
-          { color: 'LightGreen', offset: 0, opacity: 1 },
-          { color: 'Green', offset: 100, opacity: 1 },
-        ]
-
+    
+    // Apply color from data
+    if (node.data && (node.data as any).color) {
+      node.style = { fill: (node.data as any).color };
+    }
+    
+    // Apply shape
+    if (node.data && (node.data as any).shape) {
+      const shape = (node.data as any).shape.toLowerCase();
+      if (shape === 'circle' || shape === 'ellipse') {
+        node.shape = { type: 'Circle' };
+      } else if (shape === 'rectangle') {
+        node.shape = { type: 'Rectangle' };
+      } else if (shape === 'diamond') {
+        node.shape = { type: 'Diamond' };
       }
     }
+
+    // Add text
+    if (node.data && (node.data as any).name) {
+      node.annotations = [
+        {
+          content: (node.data as any).name,
+          style: { fontSize: 12, color: '#ffffff' },
+        } as any,
+      ];
+    }
+
     return node;
   }
 
@@ -115,7 +137,19 @@ export class DiagramEdit {
 
   ngOnInit(): void {
     this.snapSettings = { constraints: 0 };
-    this.items = new DataManager(this.data as JSON[], new Query().take(7));
+    
+    // Initialize with default data
+    const initialData = [
+      {
+        id: '1',
+        name: 'init',
+        parentId: null,
+        color: '#0d6efd',
+        shape: 'Circle',
+      },
+    ];
+    
+    this.items = new DataManager(initialData as JSON[], new Query().take(500));
 
     //Uses layout to auto-arrange nodes on the Diagram page
     this.layout = {
@@ -125,10 +159,9 @@ export class DiagramEdit {
     };
 
     //Configures data source for Diagram
-    console.log(this.data[0]);
     this.dataSourceSettings = {
       id: 'id',
-      parentId: 'parent',
+      parentId: 'parentId',
       dataSource: this.items,
     };
   }
@@ -144,4 +177,30 @@ export class DiagramEdit {
       this.dialog.open(NodePopUp, { data: data, panelClass: 'custom-dialog', hasBackdrop: true });
     }
   }
+
+  // Create a new node
+  createNode(): void {
+    if (!this.nodeName()) {
+      alert('Please enter a node name');
+      return;
+    }
+
+    this.treeAPI.createNode(
+      this.nodeName(),
+      this.selectedParentId(),
+      this.nodeShape(),
+      this.nodeColor()
+    );
+
+    // Reset form
+    this.nodeName.set('');
+    this.nodeColor.set('#0d6efd');
+    this.nodeShape.set('Circle');
+  }
+
+  // Get all node IDs for parent dropdown
+  getNodeIds(): string[] {
+    return this.treeAPI.nodeList().map((n) => n.id);
+  }
 }
+
