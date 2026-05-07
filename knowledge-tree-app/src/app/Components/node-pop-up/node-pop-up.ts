@@ -21,4 +21,5 @@ export class NodePopUp {
   deleteNode() {
     this.treeAPI.deleteNode(this.data.id);
   }
+
 }

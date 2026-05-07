@@ -14,6 +14,7 @@ import {
   ConnectorModel,
   DecoratorModel,
   IClickEventArgs,
+  ShapeStyleModel
 } from '@syncfusion/ej2-angular-diagrams';
 import { DataManager, Query } from '@syncfusion/ej2-data';
 import { TreeAPI } from '../../Services/tree-api';
@@ -118,6 +119,14 @@ export class DiagramEdit {
 
     return node;
   }
+
+  public contextMenuSettings = {
+    show: true,
+    items: [
+      { text: 'Add Child', id: 'addChild' },
+      { text: 'Delete Node', id: 'deleteNode' },
+    ],
+  };
 
   //Sets the default properties for connectors
   public getConnectorDefaults(connector: ConnectorModel): ConnectorModel {
