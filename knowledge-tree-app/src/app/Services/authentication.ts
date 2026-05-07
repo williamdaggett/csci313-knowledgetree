@@ -54,7 +54,7 @@ export class AuthService {
       uid: cred.user.uid,
       email,
       emailVerified: cred.user.emailVerified,
-      name,
+      name: displayName,
       providers: cred.user.providerData ?? [],
     });
 

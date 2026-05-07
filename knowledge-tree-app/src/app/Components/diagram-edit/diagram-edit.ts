@@ -14,6 +14,7 @@ import {
   ConnectorModel,
   DecoratorModel,
   IClickEventArgs,
+  ShapeStyleModel
 } from '@syncfusion/ej2-angular-diagrams';
 import { DataManager, Query } from '@syncfusion/ej2-data';
 import { TreeAPI } from '../../Services/tree-api';
@@ -74,11 +75,36 @@ export class DiagramEdit {
   }
 
   //Sets the default properties for nodes
-  public getNodeDefaults(node: NodeModel): NodeModel {
-    node.height = 20;
-    node.width = 20;
+  public getNodeDefaults(node: NodeModel){
+    node.height = 50;
+    node.width = 50;
+    node.style = {
+      fill: 'LightGreen',
+      strokeColor: 'black',
+      strokeWidth: 3,
+      gradient: {
+        type: 'Linear',
+        x1: 0,
+        y1: 0,
+        x2: 50,
+        y2: 50,
+        stops: [
+          { color: 'LightGreen', offset: 0, opacity: 1 },
+          { color: 'Green', offset: 100, opacity: 1 },
+        ]
+
+      }
+    }
     return node;
   }
+
+  public contextMenuSettings = {
+    show: true,
+    items: [
+      { text: 'Add Child', id: 'addChild' },
+      { text: 'Delete Node', id: 'deleteNode' },
+    ],
+  };
 
   //Sets the default properties for connectors
   public getConnectorDefaults(connector: ConnectorModel): ConnectorModel {

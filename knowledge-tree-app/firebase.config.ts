@@ -9,14 +9,26 @@ import { getAuth } from 'firebase/auth';
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
-//add your fir
 const firebaseConfig = {
-  //add firebase config info here
+
+  apiKey: "AIzaSyBfotHU-qqirg0Ll9RWzKsgOWA5fY75rCE",
+
+  authDomain: "knowledgetreetest-5e008.firebaseapp.com",
+
+  projectId: "knowledgetreetest-5e008",
+
+  storageBucket: "knowledgetreetest-5e008.firebasestorage.app",
+
+  messagingSenderId: "877823236914",
+
+  appId: "1:877823236914:web:1677a24bc4c64e8a16552b"
+
 };
+
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
 const auth = getAuth(app);
-export { db, auth };
+export { db, auth, firebaseConfig };
