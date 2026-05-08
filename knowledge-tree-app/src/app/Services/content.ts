@@ -1,35 +1,39 @@
 import { Injectable, signal } from '@angular/core';
 import { NodeContent, NodeContentItem } from '../models/node-content';
-import { 
-  db, 
-  collection, 
-  doc, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  getDoc, 
-  getDocs 
-} from '../../firebase.config';
+import { db } from '../../../firebase.config';
+import {
+  collection,
+  doc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  getDoc,
+  getDocs,
+  onSnapshot,
+} from 'firebase/firestore';
+import { Firestore } from 'firebase/firestore';
+import { Observable } from 'rxjs/internal/Observable';
 
 @Injectable({ providedIn: 'root' })
 export class ContentService {
   private collectionName = 'nodeContent';
-  private contentCache = signal<{ [nodeId: string]: NodeContent }>({});
+  contentCache = signal<{ [nodeId: string]: NodeContent }>({});
+  contentChange = signal<boolean>(false);
 
   // Get all content for a specific node
-  async getNodeContent(nodeId: string): Promise<NodeContent | null> {
+  async getNodeContent(ContentId: string): Promise<NodeContent | null> {
     try {
       const ref = collection(db, this.collectionName);
       const snapshot = await getDocs(ref);
-      
-      // Find content by nodeId
+
+      // Find content by contentId
       for (const doc of snapshot.docs) {
         const data = doc.data() as NodeContent;
-        if (data.nodeId === nodeId) {
+        if (data.id === ContentId) {
           return { ...data, id: doc.id };
         }
       }
-      
+
       return null;
     } catch (error) {
       console.error('Error fetching node content:', error);
@@ -38,11 +42,11 @@ export class ContentService {
   }
 
   // Create new content for a node
-  async createContent(nodeId: string, items: NodeContentItem[] = []): Promise<string> {
+  async createContent(items: NodeContentItem[] = [], nodeId: string): Promise<string> {
     try {
       const ref = collection(db, this.collectionName);
       const newContent: Omit<NodeContent, 'id'> = {
-        nodeId,
+        nodeId: nodeId,
         items,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -57,13 +61,21 @@ export class ContentService {
   }
 
   // Add item to node content
-  async addContentItem(nodeId: string, item: NodeContentItem): Promise<void> {
-    try {
-      let content = await this.getNodeContent(nodeId);
+  addContentItem(nodeId: string, item: NodeContentItem): void {
+    this.contentCache.update((cache) => {
+      cache[nodeId] = {
+        ...cache[nodeId],
+        items: [...(cache[nodeId]?.items || []), item],
+        updatedAt: new Date(),
+      };
+      return cache;
+    });
+    this.contentChange.set(true);
+    // Trying memory implementation for now
+    /*try {
+      let content = await this.getNodeContent(contentId);
 
       if (!content) {
-        // Create new content if doesn't exist
-        const id = await this.createContent(nodeId, [item]);
         return;
       }
 
@@ -80,11 +92,23 @@ export class ContentService {
       console.error('Error adding content item:', error);
       throw error;
     }
+      */
   }
 
   // Remove item from node content
-  async removeContentItem(nodeId: string, itemIndex: number): Promise<void> {
-    try {
+  removeContentItem(nodeId: string, itemId: number): void {
+    this.contentCache.update((cache) => {
+      let content = cache[nodeId];
+      if (!content) {
+        return cache;
+      }
+      content.items.splice(itemId, 1);
+      content.updatedAt = new Date();
+      cache[nodeId] = content;
+      return cache;
+    });
+    this.contentChange.set(true);
+    /*try {
       const content = await this.getNodeContent(nodeId);
 
       if (!content) {
@@ -104,15 +128,16 @@ export class ContentService {
     } catch (error) {
       console.error('Error removing content item:', error);
       throw error;
-    }
+    }*/
   }
 
   // Update item in node content
   async updateContentItem(
     nodeId: string,
     itemIndex: number,
-    updatedItem: NodeContentItem
+    updatedItem: NodeContentItem,
   ): Promise<void> {
+    /*
     try {
       const content = await this.getNodeContent(nodeId);
 
@@ -134,10 +159,23 @@ export class ContentService {
       console.error('Error updating content item:', error);
       throw error;
     }
+      */
+    this.contentCache.update((cache) => {
+      let content = cache[nodeId];
+      if (!content) {
+        return cache;
+      }
+      content.items[itemIndex] = updatedItem;
+      content.updatedAt = new Date();
+      cache[nodeId] = content;
+      return cache;
+    });
+    this.contentChange.set(true);
   }
 
   // Delete all content for a node
   async deleteNodeContent(nodeId: string): Promise<void> {
+    /*
     try {
       const content = await this.getNodeContent(nodeId);
 
@@ -151,12 +189,55 @@ export class ContentService {
       console.error('Error deleting node content:', error);
       throw error;
     }
+      */
+    this.contentCache.update((cache) => {
+      delete cache[nodeId];
+      return cache;
+    });
+    this.contentChange.set(true);
+  }
+
+  getTreeContent(id: string): Observable<{ [nodeId: string]: NodeContent }> {
+    const ref = doc(db, `${this.collectionName}/${id}`);
+    getDoc(ref);
+    return new Observable((observer) => {
+      if (!id) return;
+
+      const ref = doc(db, `${this.collectionName}/${id}`);
+
+      const unsub = onSnapshot(ref, (snap: any) => {
+        if (snap.exists()) {
+          observer.next({
+            id: snap.id,
+            ...snap.data(),
+          } as { [nodeId: string]: NodeContent });
+        }
+      });
+
+      return () => unsub();
+    });
+  }
+
+  SaveTreeContent(cache: { [nodeId: string]: NodeContent }, id: string) {
+    //save all content together in one document in the database
+    const ref = doc(db, `${this.collectionName}/${id}`);
+    return updateDoc(ref, { ...cache });
+  }
+
+  createTreeContent() {
+    const ref = collection(db, this.collectionName);
+    const newContent: { [nodeId: string]: NodeContent } = {};
+    return addDoc(ref, newContent);
+  }
+
+  deleteTreeContent(id: string) {
+    const ref = doc(db, `${this.collectionName}/${id}`);
+    return deleteDoc(ref);
   }
 
   // Extract YouTube video ID from URL
   extractYouTubeId(url: string): string | null {
-    const regex =
-      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/;
+    const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/;
     const match = url.match(regex);
     return match ? match[1] : null;
   }
@@ -178,10 +259,6 @@ export class ContentService {
 
   // Validate video URL
   isValidVideoUrl(url: string): boolean {
-    return (
-      url.includes('youtube.com') ||
-      url.includes('youtu.be') ||
-      url.includes('vimeo.com')
-    );
+    return url.includes('youtube.com') || url.includes('youtu.be') || url.includes('vimeo.com');
   }
 }

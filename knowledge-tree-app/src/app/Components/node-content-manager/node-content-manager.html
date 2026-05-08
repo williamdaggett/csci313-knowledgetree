@@ -85,37 +85,50 @@
   }
 
   <!-- Content List -->
-  @if (contentList().length > 0) {
+  @if (content()?.items!.length > 0) {
     <div class="content-list">
-      @for (content of contentList(); track content.id) {
+      @for (content of content()?.items; track content.id) {
         <div class="content-item">
           <div class="content-header-item">
             <span class="content-badge" [class]="'badge-' + content.type">{{ content.type }}</span>
             <h6>{{ content.title }}</h6>
-            <button class="btn btn-sm btn-danger" (click)="deleteContent(content.id)">Delete</button>
+            <button class="btn btn-sm btn-danger" (click)="deleteContent(content.id)">
+              Delete
+            </button>
           </div>
 
-          @if (content.description) {
+          @if (content.type != 'text' && content.description) {
             <p class="content-description">{{ content.description }}</p>
           }
 
           <!-- Text Content -->
           @if (content.type === 'text') {
-            <div class="content-preview text-content">{{ content.textContent }}</div>
+            <div class="content-preview text-content">{{ content.content }}</div>
           }
 
           <!-- Image Content -->
           @if (content.type === 'image' && content.url) {
-            <img [src]="content.url" alt="{{ content.title }}" class="content-preview image-content" />
+            <img
+              [src]="content.url"
+              alt="{{ content.title }}"
+              class="content-preview image-content"
+            />
           }
 
           <!-- Video Content -->
-          @if (content.type === 'video' && content.youtubeId) {
+          @if (content.type === 'video' && content.url) {
             <iframe
               class="content-preview video-content"
               [src]="getYoutubeEmbedUrl(content)"
               title="{{ content.title }}"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allow="
+                accelerometer;
+                autoplay;
+                clipboard-write;
+                encrypted-media;
+                gyroscope;
+                picture-in-picture;
+              "
               allowfullscreen
             ></iframe>
           }

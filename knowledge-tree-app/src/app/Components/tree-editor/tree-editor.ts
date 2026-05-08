@@ -16,6 +16,8 @@ import { AuthService } from '../../Services/authentication';
 import { REQUIRED } from '@angular/forms/signals';
 import { DiagramEdit } from '../diagram-edit/diagram-edit';
 import { TreeDiagram } from '../../models/tree-diagram';
+import { ContentService } from '../../Services/content';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-tree-creator',
@@ -26,13 +28,17 @@ import { TreeDiagram } from '../../models/tree-diagram';
 export class TreeEditor {
   id = input.required<string>(); //might need new edit component tbh it would probably be easier
 
+  router = inject(Router);
   treeAPI = inject(TreeAPI);
+  contentService = inject(ContentService);
   authService = inject(AuthService);
 
   TreeOriginalName = signal<string | null>(null);
   TreeName = signal<string>('');
   TreeOriginalDescription = signal<string | null>(null);
   TreeDescription = signal<string>('');
+
+  contentId = signal<string>('');
 
   TreeDiagramId = signal<string>('');
 
@@ -42,7 +48,7 @@ export class TreeEditor {
 
   userId = signal<string>('');
 
-  save = computed<boolean>(() => {
+  saveDescription = computed<boolean>(() => {
     return (
       this.TreeName() === this.TreeOriginalName() &&
       this.TreeDescription() === this.TreeOriginalDescription()
@@ -94,7 +100,21 @@ export class TreeEditor {
           .subscribe((t) => {
             if (t) {
               this.treeAPI.nodeList.set(t.nodeList);
+              this.contentId.set(t.contentId);
+              this.treeAPI.nodeChange.set(false);
             }
+          });
+      }
+    });
+    effect(() => {
+      const value = this.contentId();
+      if (value) {
+        this.contentService
+          .getTreeContent(value)
+          .pipe()
+          .subscribe((content) => {
+            this.contentService.contentCache.set(content);
+            this.contentService.contentChange.set(false);
           });
       }
     });
@@ -105,6 +125,9 @@ export class TreeEditor {
       nodeList: this.treeAPI.nodeList(),
     } as Partial<TreeDiagram>;
     this.treeAPI.saveDiagram(this.TreeDiagramId(), treeDiagram);
+    this.contentService.SaveTreeContent(this.contentService.contentCache(), this.contentId());
+    this.treeAPI.nodeChange.set(false);
+    this.contentService.contentChange.set(false);
   }
 
   async SaveTree() {
@@ -121,5 +144,13 @@ export class TreeEditor {
     } as Partial<TreeDescription>;
     this.treeAPI.update(this.id()!, EditTree);
     this.loading.set(false);
+  }
+
+  publish() {
+    const EditTree = {
+      published: true,
+    } as Partial<TreeDescription>;
+    this.treeAPI.update(this.id()!, EditTree);
+    this.router.navigate(['dashboard']);
   }
 }

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TreeListItem } from './tree-list-item';
+import { NodeContentViewer } from './node-content-viewer';
 
-describe('TreeListItem', () => {
-  let component: TreeListItem;
-  let fixture: ComponentFixture<TreeListItem>;
+describe('NodeContentViewer', () => {
+  let component: NodeContentViewer;
+  let fixture: ComponentFixture<NodeContentViewer>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TreeListItem]
+      imports: [NodeContentViewer]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(TreeListItem);
+    fixture = TestBed.createComponent(NodeContentViewer);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

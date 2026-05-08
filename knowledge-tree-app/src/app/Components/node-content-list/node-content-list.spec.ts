@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TreeGraph } from './tree-graph';
+import { NodeContentList } from './node-content-list';
 
-describe('TreeGraph', () => {
-  let component: TreeGraph;
-  let fixture: ComponentFixture<TreeGraph>;
+describe('NodeContentList', () => {
+  let component: NodeContentList;
+  let fixture: ComponentFixture<NodeContentList>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TreeGraph]
+      imports: [NodeContentList]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(TreeGraph);
+    fixture = TestBed.createComponent(NodeContentList);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

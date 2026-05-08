@@ -28,7 +28,6 @@
     "@angular/common": "^21.1.0",
     "@angular/compiler": "^21.1.0",
     "@angular/core": "^21.1.0",
-    "@angular/fire": "^20.0.1",
     "@angular/forms": "^21.1.0",
     "@angular/material": "^21.2.9",
     "@angular/platform-browser": "^21.1.0",
@@ -36,6 +35,8 @@
     "@syncfusion/ej2-angular-diagrams": "^33.2.5",
     "bootstrap": "^5.3.8",
     "firebase": "^12.12.1",
+    "ngx-color": "^10.1.0",
+    "ngx-colors": "^3.6.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },

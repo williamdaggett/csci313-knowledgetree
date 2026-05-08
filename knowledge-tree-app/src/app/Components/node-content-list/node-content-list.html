@@ -1,0 +1,13 @@
+@if (!content()) {
+  <div class="text-center text-muted p-4">No content</div>
+} @else if (content()!.items.length === 0) {
+  <div class="text-center text-muted p-4">No content items</div>
+} @else {
+  <div class="content-list content-list-container">
+    @for (item of content()!.items; track item.id) {
+      <div class="content-item mb-4">
+        <app-node-content-viewer [item]="item"> </app-node-content-viewer>
+      </div>
+    }
+  </div>
+}
