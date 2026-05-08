@@ -1,19 +1,16 @@
 import { Injectable } from '@angular/core';
+import { auth, db } from '../../../firebase.config';
 import {
-  auth,
-  db,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
-  doc,
-  getDoc,
-  setDoc,
-} from '../../../firebase.config';
+} from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 import { AppUser } from '../models/user';
 
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, from } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {

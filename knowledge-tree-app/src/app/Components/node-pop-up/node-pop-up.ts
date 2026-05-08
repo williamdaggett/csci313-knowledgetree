@@ -1,29 +1,55 @@
-import { Component, inject, signal, effect, OnInit } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
 import { TreeAPI } from '../../Services/tree-api';
+import { BrowserModule } from '@angular/platform-browser';
+import { ColorSketchModule } from 'ngx-color/sketch';
+import { TreeNode } from '../../models/tree-diagram';
+import { FormsModule } from '@angular/forms';
+import { ContentType, NodeContent, NodeContentItem } from '../../models/node-content';
 import { ContentService } from '../../Services/content';
-import { NodeContent, NodeContentItem, ContentType } from '../../models/node-content';
 
 //handle tree edit operations in diagram edit
 @Component({
   selector: 'app-node-pop-up',
-  standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [ColorSketchModule, FormsModule],
   templateUrl: './node-pop-up.html',
   styleUrl: './node-pop-up.css',
 })
-export class NodePopUp implements OnInit {
+export class NodePopUp {
+  constructor(private dialogRef: MatDialogRef<NodePopUp>) {
+    effect(() => {
+      this.loadNodeContent();
+    });
+    effect(() => {
+      const size = this.size();
+      const shape = this.shape();
+      const color = this.color();
+      const name = this.name();
+      let node = {
+        id: this.data.id,
+        name: this.name(),
+        parent: this.data.parent,
+        color: color,
+        shape: shape,
+        size: size,
+      } as TreeNode;
+      //handle when it initially opens
+      if (this.hasInit) {
+        this.treeAPI.editNode(node);
+      } else {
+        this.hasInit = true;
+      }
+    });
+  }
+
   treeAPI = inject(TreeAPI);
   contentService = inject(ContentService);
-  dialogRef = inject(MatDialogRef);
   data = inject(MAT_DIALOG_DATA) as any;
 
-  // Content display
+  hasInit = false;
+
   nodeContent = signal<NodeContent | null>(null);
   loading = signal<boolean>(false);
-
   // Form for adding content
   contentType = signal<ContentType>('text');
   videoUrl = signal<string>('');
@@ -34,31 +60,22 @@ export class NodePopUp implements OnInit {
   imageUrl = signal<string>('');
   imageTitle = signal<string>('');
   imageDescription = signal<string>('');
-
   // UI state
   showAddForm = signal<boolean>(false);
   editingIndex = signal<number | null>(null);
 
-  constructor() {
-    effect(() => {
-      this.loadNodeContent();
-    });
-  }
+  sizes = ['Big', 'Medium', 'Small'];
+  size = signal<string>(this.data.size);
+
+  shapes = ['Ellipse', 'Rectangle', 'Triangle'];
+  shape = signal<string>(this.data.shape);
+
+  color = signal<string>(this.data.color);
+
+  name = signal<string>(this.data.name);
 
   ngOnInit(): void {
     this.loadNodeContent();
-  }
-
-  async loadNodeContent(): Promise<void> {
-    this.loading.set(true);
-    try {
-      const content = await this.treeAPI.getNodeContent(this.data.id);
-      this.nodeContent.set(content);
-    } catch (error) {
-      console.error('Error loading node content:', error);
-    } finally {
-      this.loading.set(false);
-    }
   }
 
   async addContent(): Promise<void> {
@@ -82,6 +99,7 @@ export class NodePopUp implements OnInit {
 
           const videoId = this.contentService.extractYouTubeId(this.videoUrl());
           item = {
+            id: crypto.randomUUID(),
             type: 'video',
             url: this.videoUrl(),
             title: this.videoTitle() || 'Untitled Video',
@@ -104,6 +122,7 @@ export class NodePopUp implements OnInit {
           }
 
           item = {
+            id: crypto.randomUUID(),
             type: 'image',
             url: this.imageUrl(),
             title: this.imageTitle() || 'Untitled Image',
@@ -119,6 +138,7 @@ export class NodePopUp implements OnInit {
           }
 
           item = {
+            id: crypto.randomUUID(),
             type: 'text',
             content: this.textContent(),
             title: this.textTitle(),
@@ -204,14 +224,32 @@ export class NodePopUp implements OnInit {
     this.showAddForm.set(false);
   }
 
-  addChild(): void {
-    this.treeAPI.createNode('Default', this.data.id, 'circle', 'black');
+  addChild() {
+    this.treeAPI.createNode('Default', this.data.id, 'Ellipse', 'black', 'Medium');
     console.log(this.treeAPI.nodeList());
   }
 
-  deleteNode(): void {
+  deleteNode() {
     this.treeAPI.deleteNode(this.data.id);
+    this.closeDialog();
+  }
+
+  closeDialog() {
     this.dialogRef.close();
+  }
+
+  async loadNodeContent(): Promise<void> {
+    this.loading.set(true);
+    try {
+      let content = await this.treeAPI.getNodeContent(this.data.id);
+      if (content) {
+        this.nodeContent.set(content);
+      }
+    } catch (error) {
+      console.error('Error loading node content:', error);
+    } finally {
+      this.loading.set(false);
+    }
   }
 
   getYouTubeEmbedUrl(url: string): string {
@@ -219,4 +257,3 @@ export class NodePopUp implements OnInit {
     return videoId ? `https://www.youtube.com/embed/${videoId}` : '';
   }
 }
-

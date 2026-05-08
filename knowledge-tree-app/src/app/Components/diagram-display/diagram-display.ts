@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation, ViewChild, inject, effect } from '@angular/core';
+import { Component, ViewEncapsulation, ViewChild, inject, effect, output } from '@angular/core';
 import {
   DiagramComponent,
   Diagram,
@@ -30,11 +30,11 @@ Diagram.Inject(DataBinding, RadialTree);
 
   providers: [RadialTreeService, DataBindingService],
   standalone: true,
-  selector: 'app-diagram-edit',
-  templateUrl: './diagram-edit.html',
+  selector: 'app-diagram-display',
+  templateUrl: './diagram-display.html',
   encapsulation: ViewEncapsulation.None,
 })
-export class DiagramEdit {
+export class DiagramDisplay {
   @ViewChild('diagram')
   public diagram?: DiagramComponent;
   public snapSettings?: SnapSettingsModel;
@@ -44,6 +44,8 @@ export class DiagramEdit {
 
   treeAPI = inject(TreeAPI);
   dialog = inject(MatDialog);
+
+  loadContent = output<string[]>(); //node content id
 
   //Initializes data source
   public data: object[] = [
@@ -114,12 +116,17 @@ export class DiagramEdit {
         ],
       },
     };
-
     if (data?.shape) {
       //basic shape types available: Rectangle, Ellipse,
       // Polygon, Triangle, Plus, Star, Pentagon,
       // Hexagon, Octagon, Trapezoid, Parallelogram, Diamond
       node.shape = { type: 'Basic', shape: data?.shape };
+    }
+    if (data?.completed === true) {
+    } else if (data?.completed === false) {
+      node.style = {
+        opacity: 0.3,
+      };
     }
     if (data?.size) {
       switch (data.size) {
@@ -181,34 +188,37 @@ export class DiagramEdit {
     const element = args.element as NodeModel;
     if (element && element.data) {
       const data = element.data as TreeNode;
-      console.log('Full data:', data);
-      console.log('Node ID:', data.id);
-      console.log('Name:', data.name);
-      console.log('Color:', data.color);
-      this.dialog.open(NodePopUp, {
-        data: data,
-        panelClass: 'custom-dialog',
-        hasBackdrop: true,
-        maxWidth: '90vw',
-        maxHeight: '90vh',
-        autoFocus: false,
-      });
+      if (data.id == '1') return;
+      if (data.completed == true) {
+        this.loadContent.emit([data.contentId ? data.contentId : 'EMPTY', 'COMPLETE', data.id]);
+      } else if (data.parent == '1') {
+        this.loadContent.emit([data.contentId ? data.contentId : 'EMPTY', 'INCOMPLETE', data.id]);
+      } else {
+        for (const n of this.treeAPI.nodeList()) {
+          if (n.id == data.parent) {
+            if (n.completed == true) {
+              this.loadContent.emit([
+                data.contentId ? data.contentId : 'EMPTY',
+                'INCOMPLETE',
+                data.id,
+              ]);
+            } else {
+              this.loadContent.emit(['LOCK', 'INCOMPLETE', data.id]);
+            }
+            return;
+          }
+        }
+      }
     }
   }
 
-  gradientColor(hex: string): string {
+  invertColor(hex: string) {
     // Remove # if present
     if (hex.indexOf('#') === 0) hex = hex.slice(1);
     // Convert to RGB
-    let r = Math.trunc(parseInt(hex.slice(0, 2), 16) * 0.7)
-      .toString(16)
-      .padStart(2, '0');
-    let g = Math.trunc(parseInt(hex.slice(2, 4), 16) * 0.7)
-      .toString(16)
-      .padStart(2, '0');
-    let b = Math.trunc(parseInt(hex.slice(4, 6), 16) * 0.7)
-      .toString(16)
-      .padStart(2, '0');
+    let r = (255 - parseInt(hex.slice(0, 2), 16)).toString(16).padStart(2, '0');
+    let g = (255 - parseInt(hex.slice(2, 4), 16)).toString(16).padStart(2, '0');
+    let b = (255 - parseInt(hex.slice(4, 6), 16)).toString(16).padStart(2, '0');
     // Return as Hex
     return '#' + r + g + b;
   }

@@ -1,0 +1,20 @@
+.content-viewer {
+  width: 100%;
+}
+
+iframe {
+  width: 100%;
+  border: none;
+  border-radius: 8px;
+}
+
+img {
+  max-width: 100%;
+  max-height: 500px;
+  object-fit: contain;
+}
+
+.text-body {
+  white-space: pre-wrap;
+  line-height: 1.6;
+}

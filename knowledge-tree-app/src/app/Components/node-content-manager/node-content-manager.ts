@@ -2,7 +2,8 @@ import { Component, Input, inject, signal, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { TreeAPI } from '../../Services/tree-api';
-import { NodeContent } from '../../models/node-content';
+import { NodeContent, NodeContentItem } from '../../models/node-content';
+import { ContentService } from '../../Services/content';
 
 @Component({
   selector: 'app-node-content-manager',
@@ -15,9 +16,10 @@ export class NodeContentManager {
   @Input() nodeId!: string;
 
   treeAPI = inject(TreeAPI);
+  contentService = inject(ContentService);
 
   // Content list
-  contentList = signal<NodeContent[]>([]);
+  content = signal<NodeContent | null>(null);
   loading = signal(false);
 
   // Form state
@@ -37,12 +39,9 @@ export class NodeContentManager {
     });
   }
 
-  loadContent(): void {
-    this.treeAPI
-      .watchNodeContent(this.nodeId)
-      .subscribe((content) => {
-        this.contentList.set(content);
-      });
+  async loadContent() {
+    const content = (await this.treeAPI.getNodeContent(this.nodeId)) as NodeContent;
+    this.content.set(content);
   }
 
   addContent(): void {
@@ -64,33 +63,30 @@ export class NodeContentManager {
     this.loading.set(true);
 
     const newContent = {
-      nodeId: this.nodeId,
+      id: crypto.randomUUID(),
       type: this.contentType(),
       title: this.contentTitle(),
       description: this.contentDescription(),
       textContent: this.textContent() || undefined,
       url: this.contentUrl() || undefined,
-    };
+    } as NodeContentItem;
 
-    this.treeAPI
-      .addContentToNode(this.nodeId, newContent)
-      .then(() => {
-        this.resetForm();
-        this.loading.set(false);
-      })
-      .catch((err) => {
-        console.error('Error adding content:', err);
-        this.loading.set(false);
-      });
+    this.contentService.addContentItem(this.nodeId, newContent);
+    this.resetForm();
+    this.loading.set(false);
   }
 
-  deleteContent(contentId: string): void {
+  deleteContent(contentItemId: string): void {
     if (!confirm('Are you sure you want to delete this content?')) return;
 
-    this.treeAPI
-      .deleteContent(contentId)
+    this.contentService
+      .deleteNodeContent(contentItemId)
       .then(() => {
-        this.contentList.update((list) => list.filter((c) => c.id !== contentId));
+        this.content.update((list) => {
+          if (!list) return list;
+          list.items = list?.items.filter((c) => c.id !== contentItemId);
+          return list;
+        });
       })
       .catch((err) => console.error('Error deleting content:', err));
   }
@@ -108,9 +104,9 @@ export class NodeContentManager {
     this.showForm.update((v) => !v);
   }
 
-  getYoutubeEmbedUrl(content: NodeContent): string {
-    if (content.youtubeId) {
-      return `https://www.youtube.com/embed/${content.youtubeId}`;
+  getYoutubeEmbedUrl(content: NodeContentItem): string {
+    if (content.type === 'video' && content.url) {
+      return `https://www.youtube.com/embed/${this.contentService.extractYouTubeId(content.url)}`;
     }
     return '';
   }

@@ -1,20 +1,30 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { TreeListItem } from '../tree-list-item/tree-list-item';
+import { Component, computed, inject, signal, effect } from '@angular/core';
 import { TreeDescription } from '../../models/tree-description';
 import { TreeAPI } from '../../Services/tree-api';
 import { FormsModule } from '@angular/forms';
 import { or } from 'firebase/firestore';
+import { AuthService } from '../../Services/authentication';
+import { AppUser } from '../../models/user';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-browse-trees',
-  imports: [TreeListItem, FormsModule],
+  imports: [FormsModule],
   templateUrl: './browse-trees.html',
   styleUrl: './browse-trees.css',
 })
 export class BrowseTrees {
+  authService = inject(AuthService);
   treeAPI = inject(TreeAPI);
+  router = inject(Router);
+
+  user = signal<AppUser | null>(null);
 
   trees = signal<TreeDescription[]>([]);
+
+  loading = signal<Boolean>(false);
+
+  authorNames = signal<string[]>([]);
 
   filteredTrees = computed<TreeDescription[]>(() => {
     if (this.filter() === '') {
@@ -42,17 +52,37 @@ export class BrowseTrees {
   visiblePages = signal<number[]>([]);
   itemsPerPage = 10;
   totalPages = computed<number>(() => {
-    return Math.ceil(this.trees().length / 10);
+    return Math.ceil(this.filteredTrees().length / 10);
   });
 
   constructor() {
     this.treeAPI
-      .getAll()
+      .getPublished()
       .pipe()
       .subscribe((trees) => {
         this.trees.set(trees);
-        //this.updatePage();
       });
+    this.authService.user$.pipe().subscribe((u) => {
+      this.user.set(u);
+    });
+    effect(async () => {
+      const trees = this.paginatedTrees();
+      this.authorNames.set([]);
+      let nameList = [];
+      for (const t of trees) {
+        let author = await this.authService.getUserProfile(t.authorId);
+        if (author) {
+          nameList.push(author.name);
+        } else {
+          nameList.push('Unknown');
+        }
+      }
+      this.authorNames.set(nameList);
+    });
+    effect(() => {
+      const total = this.totalPages();
+      this.visiblePages.set(this.getVisiblePages(this.visibleBase()));
+    });
   }
 
   ngOnInit() {
@@ -94,5 +124,11 @@ export class BrowseTrees {
 
   adjustPages(step: number) {
     this.visiblePages.set(this.getVisiblePages(this.visibleBase() + step));
+  }
+
+  async learn(description: TreeDescription) {
+    this.loading.set(true);
+    let id = await this.treeAPI.createProgressTree(description, this.user()!.uid);
+    this.router.navigate(['/tree', id]);
   }
 }
