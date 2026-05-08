@@ -1,14 +1,54 @@
 <!--Maybe Make Into Standalone Route instead of child of login?-->
 
-<div class="container w-50 text-center">
-  <h2>Welcome</h2>
-  <div class="card">
-    <div class="card-header">
-      <h4>Account Details</h4>
+<div class="account-page">
+  <div class="account-header">
+    <div>
+      <p class="eyebrow">My Account</p>
+      <h1>Welcome back, {{ user()?.name || 'Learner' }}.</h1>
+      <p class="account-copy">Your profile information is shown below. Use your dashboard to continue editing and viewing your learning trees.</p>
     </div>
-    <div class="card-body text-start">
-      <p>Username: {{ user()?.name }}</p>
-      <p>Email: {{ user()?.email }}</p>
-    </div>
+  </div>
+
+  <div class="account-grid">
+    <section class="profile-card">
+      <div class="profile-top">
+        <div class="avatar">{{ user()?.name?.charAt(0)?.toUpperCase() || 'U' }}</div>
+        <div>
+          <p class="profile-label">Signed in as</p>
+          <h2>{{ user()?.name || 'Unknown User' }}</h2>
+          <p class="profile-email">{{ user()?.email || 'No email available' }}</p>
+        </div>
+      </div>
+
+      <div class="profile-details">
+        <div class="detail-pill">
+          <span>Status</span>
+          <strong>Active</strong>
+        </div>
+        <div class="detail-pill">
+          <span>Member since</span>
+          <strong>Today</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="details-card">
+      <div class="card-header">
+        <h4>Account details</h4>
+      </div>
+      <div class="card-body">
+        <div class="detail-row">
+          <span>Username</span>
+          <strong>{{ user()?.name || '—' }}</strong>
+        </div>
+        <div class="detail-row">
+          <span>Email</span>
+          <strong>{{ user()?.email || '—' }}</strong>
+        </div>
+      </div>
+      <div class="card-actions">
+        <a routerLink="/dashboard" class="btn btn-primary">Go to Dashboard</a>
+      </div>
+    </section>
   </div>
 </div>
