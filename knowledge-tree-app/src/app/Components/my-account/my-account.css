@@ -1,0 +1,189 @@
+.account-page {
+  min-height: 72vh;
+  padding: 2rem 1rem 3rem;
+  background: linear-gradient(180deg, #eef2ff 0%, #f8fafc 100%);
+}
+
+.account-header {
+  max-width: 980px;
+  margin: 0 auto 2rem;
+  padding: 1.75rem 2rem;
+  background: #ffffff;
+  border-radius: 26px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.08);
+}
+
+.eyebrow {
+  margin: 0 0 0.8rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #5b63d5;
+}
+
+.account-header h1 {
+  margin: 0;
+  font-size: clamp(2rem, 2.5vw, 3rem);
+  line-height: 1.05;
+  color: #0f172a;
+}
+
+.account-copy {
+  margin: 0.9rem 0 0;
+  color: #475569;
+  font-size: 1rem;
+  line-height: 1.8;
+  max-width: 720px;
+}
+
+.account-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 1.5rem;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.profile-card,
+.details-card {
+  background: #ffffff;
+  border-radius: 26px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.06);
+  padding: 1.75rem;
+}
+
+.profile-top {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4f46e5, #818cf8);
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  font-size: 2.4rem;
+  font-weight: 700;
+  box-shadow: 0 24px 40px rgba(79, 70, 229, 0.2);
+}
+
+.profile-label {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.82rem;
+  color: #64748b;
+}
+
+.profile-top h2 {
+  margin: 0.1rem 0 0;
+  font-size: 1.9rem;
+  color: #0f172a;
+}
+
+.profile-email {
+  margin: 0.6rem 0 0;
+  color: #475569;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.profile-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.detail-pill {
+  padding: 1rem 1.1rem;
+  background: #f8fafc;
+  border-radius: 18px;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.detail-pill span {
+  color: #64748b;
+  font-size: 0.88rem;
+}
+
+.detail-pill strong {
+  color: #111827;
+  font-size: 1.05rem;
+}
+
+.card-header {
+  margin-bottom: 1rem;
+}
+
+.card-header h4 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: #111827;
+}
+
+.card-body {
+  display: grid;
+  gap: 1rem;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border-radius: 18px;
+  background: #f8fafc;
+  align-items: center;
+}
+
+.detail-row span {
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.detail-row strong {
+  color: #111827;
+  font-size: 1rem;
+}
+
+.card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.95rem 1.4rem;
+  border-radius: 999px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.btn-primary {
+  background: #4f46e5;
+  color: #ffffff;
+  border: none;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  opacity: 0.98;
+}
+
+@media (max-width: 840px) {
+  .account-grid {
+    grid-template-columns: 1fr;
+  }
+}

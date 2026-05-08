@@ -9,7 +9,6 @@ import { getAuth } from 'firebase/auth';
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
-//add your fir
 const firebaseConfig = {
   apiKey: 'AIzaSyDvlRsFFUi60ScqOuG5NQRhiLZMjm0CVRE',
   authDomain: 'crud-demo-a7e2c.firebaseapp.com',
@@ -20,9 +19,10 @@ const firebaseConfig = {
   measurementId: 'G-T2N0PX8LBP',
 };
 
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
 const auth = getAuth(app);
-export { db, auth };
+export { db, auth, firebaseConfig };

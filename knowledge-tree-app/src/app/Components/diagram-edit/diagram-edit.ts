@@ -149,6 +149,14 @@ export class DiagramEdit {
     return node;
   }
 
+  public contextMenuSettings = {
+    show: true,
+    items: [
+      { text: 'Add Child', id: 'addChild' },
+      { text: 'Delete Node', id: 'deleteNode' },
+    ],
+  };
+
   //Sets the default properties for connectors
   public getConnectorDefaults(connector: ConnectorModel): ConnectorModel {
     (connector.targetDecorator as DecoratorModel).shape = 'None';

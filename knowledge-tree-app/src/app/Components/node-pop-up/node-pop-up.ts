@@ -256,4 +256,5 @@ export class NodePopUp {
     const videoId = this.contentService.extractYouTubeId(url);
     return videoId ? `https://www.youtube.com/embed/${videoId}` : '';
   }
+
 }
