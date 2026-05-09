@@ -26,6 +26,17 @@ export class LogIn {
   constructor() {
     this.auth.user$.subscribe((user) => {
       this.user.set(user);
+      if (user) {
+        this.router.navigate(['/']);
+      }
+    });
+  }
+
+  ngOnInit() {
+    this.auth.user$.subscribe((user) => {
+      if (user) {
+        this.router.navigate(['/']);
+      }
     });
   }
 
@@ -58,5 +69,6 @@ export class LogIn {
 
   logout() {
     this.auth.logout();
+    this.router.navigate(['/']);
   }
 }

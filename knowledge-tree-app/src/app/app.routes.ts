@@ -8,11 +8,13 @@ import { TreeDisplay } from './Components/tree-display/tree-display';
 import { TreeCreator } from './Components/tree-creator/tree-creator';
 import { authGuard } from './guards/auth-guard';
 import { TreeEditor } from './Components/tree-editor/tree-editor';
+import { MyAccount } from './Components/my-account/my-account';
 
 export const routes: Routes = [
   { path: '', component: Home, title: 'Home' },
   { path: 'login', component: LogIn, title: 'Log In' },
   { path: 'create-account', component: CreateAccount, title: 'Create Account' },
+  { path: 'my-account', component: MyAccount, title: 'My Account', canActivate: [authGuard] },
   {
     path: 'dashboard',
     component: UserDashboard,

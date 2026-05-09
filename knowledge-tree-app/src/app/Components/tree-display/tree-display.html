@@ -11,8 +11,8 @@
         </div>
 
         <div class="card-body d-flex flex-column">
-          @switch (contentId()) {
-            @case ('LOCK') {
+          @switch (locked()) {
+            @case (true) {
               <h5 class="text-center">Complete the prior nodes before completing this one</h5>
             }
             @default {
@@ -21,7 +21,7 @@
           }
 
           <button
-            class="btn btn-success mt-auto"
+            class="btn btn-outline-success mt-auto"
             [class.disabled]="!contentCompletable()"
             (click)="completeNode()"
           >
@@ -36,7 +36,7 @@
         <div class="card-header display-card-head">
           <h2>{{ TreeName() }} --- {{ TreeDescription() }} --- {{ progress() }}</h2>
 
-          <button class="btn btn-primary" (click)="saveTree()" [class.disabled]="saved()">
+          <button class="btn btn-outline-primary" (click)="saveTree()" [class.disabled]="saved()">
             Save Progress
           </button>
         </div>
