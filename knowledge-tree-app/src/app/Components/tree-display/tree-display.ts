@@ -22,6 +22,7 @@ export class TreeDisplay {
   content = signal<any>(null);
 
   contentId = signal<string>('');
+  locked = signal<boolean>(false);
   contentCompletable = signal<boolean>(false);
   nodeId = signal<string>('');
   nodeName = computed(() => {
@@ -97,6 +98,7 @@ export class TreeDisplay {
   }
 
   receiveId(id: string[]) {
+    this.locked.set(id[0] === 'LOCK');
     this.contentCompletable.set(id[1] !== 'COMPLETE' && id[0] !== 'LOCK');
     this.nodeId.set(id[2]);
     this.content.set(this.contentService.contentCache()[id[2]]);

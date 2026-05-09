@@ -5,7 +5,10 @@
     <div>
       <p class="eyebrow">My Account</p>
       <h1>Welcome back, {{ user()?.name || 'Learner' }}.</h1>
-      <p class="account-copy">Your profile information is shown below. Use your dashboard to continue editing and viewing your learning trees.</p>
+      <p class="account-copy">
+        Your profile information is shown below. Use your dashboard to continue editing and viewing
+        your learning trees.
+      </p>
     </div>
   </div>
 
@@ -50,5 +53,8 @@
         <a routerLink="/dashboard" class="btn btn-primary">Go to Dashboard</a>
       </div>
     </section>
+  </div>
+  <div class="logout-button d-flex justify-content-center mt-5">
+    <a routerLink="/login" class="btn btn-primary" (click)="logout()">Logout</a>
   </div>
 </div>

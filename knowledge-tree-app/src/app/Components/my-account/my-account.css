@@ -1,7 +1,9 @@
 .account-page {
   min-height: 72vh;
   padding: 2rem 1rem 3rem;
-  background: linear-gradient(180deg, #eef2ff 0%, #f8fafc 100%);
+  /*background: linear-gradient(180deg, #eef2ff 0%, #f8fafc 100%);
+
+  */
 }
 
 .account-header {
@@ -168,7 +170,10 @@
   border-radius: 999px;
   font-weight: 700;
   text-decoration: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .btn-primary {

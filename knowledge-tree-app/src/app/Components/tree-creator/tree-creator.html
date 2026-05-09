@@ -1,4 +1,4 @@
-<div class="container text-center">
+<div class="container text-center page-background">
   @if (TreeMetaDataId()) {
     <h1>Edit Your Tree</h1>
   } @else {
@@ -25,16 +25,16 @@
         </div>
 
         @if (save() && TreeMetaDataId()) {
-          <button class="btn btn-primary m-2" type="submit" [disabled]="loading()">
+          <button class="btn btn-outline-primary m-2" type="submit" [disabled]="loading()">
             Save Tree
           </button>
           <h3>Tree Saved Succsesfully</h3>
         } @else if (!TreeMetaDataId()) {
-          <button class="btn btn-primary m-2" type="submit" [disabled]="loading()">
+          <button class="btn btn-outline-primary m-2" type="submit" [disabled]="loading()">
             Create Tree
           </button>
         } @else {
-          <button class="btn btn-primary m-2" type="submit" [disabled]="loading()">
+          <button class="btn btn-outline-primary m-2" type="submit" [disabled]="loading()">
             Save Tree Info
           </button>
           <h3>Tree not saved!</h3>

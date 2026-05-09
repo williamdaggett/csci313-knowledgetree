@@ -7,9 +7,9 @@
 }
 
 button.active {
-  background-color: #007bff;
+  background-color: #4f46e5;
   color: white;
-  border-color: #007bff;
+  border-color: #4f46e5;
 }
 
 .nodeEdit {

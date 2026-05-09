@@ -4,3 +4,127 @@
 @import '../node_modules/@syncfusion/ej2-popups/styles/material3.css';
 @import '../node_modules/@syncfusion/ej2-splitbuttons/styles/material3.css';
 @import '../node_modules/@syncfusion/ej2-navigations/styles/material3.css';
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.btn-outline-primary {
+  border-color: #4f46e5;
+  background-color: #4f46e5;
+  color: white;
+}
+
+.btn-primary {
+  background: #4f46e5;
+  color: #ffffff;
+  border: none;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  opacity: 0.98;
+}
+.btn-outline-primary:hover {
+  border-color: #4f46e5;
+  background-color: #4f46e5;
+  transform: translateY(-1px);
+  opacity: 0.98;
+}
+
+.btn-outline-danger {
+  border-color: #b00000;
+  background-color: #b00000;
+  color: #ffffff;
+}
+
+.btn-outline-danger:hover {
+  border-color: #b00000;
+  background-color: #b00000;
+  transform: translateY(-1px);
+  opacity: 0.98;
+}
+
+.btn-outline-danger:disabled {
+  border-color: #b00000;
+  background-color: #b00000;
+  color: #ffffff;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-outline-primary:disabled {
+  border-color: #4f46e5;
+  background-color: #4f46e5;
+  color: #ffffff;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+body {
+  min-height: 100%;
+  background: linear-gradient(180deg, #eef2ff 0%, #f8fafc 120%);
+}
+
+.custom-table th {
+  background: linear-gradient(180deg, #57558e 0%, #6b69ac 100%);
+  background-color: #57558e;
+  border-color: #57558e;
+  color: #ffffff;
+}
+
+.custom-table .table-light td {
+  background-color: #f8f9fa;
+}
+
+.custom-table .table-secondary td {
+  background-color: rgb(216, 199, 251);
+}
+
+.table-wraper {
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
+  background-color: transparent;
+
+  margin-bottom: 0;
+}
+
+table .custom-table {
+  margin-bottom: 0px;
+  padding-bottom: 0px;
+  border-collapse: collapse;
+}
+
+.page-item.active .page-link {
+  background-color: #4f46e5;
+  border-color: #4f46e5;
+  color: white;
+}
+
+.page-link {
+  color: #4f46e5; /* text color */
+  background-color: white;
+  border: 1px solid #e5e7eb;
+}
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: #4f46e5; /* selected background */
+  color: white; /* selected text color */
+  border: 1px solid #4f46e5;
+  border-radius: 6px;
+  padding: 8px 12px;
+}
